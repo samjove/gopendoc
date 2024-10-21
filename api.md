@@ -1,8 +1,14 @@
 # API Documentation
 
 ## @route GET
-Function: `GetUsers`
+_Get a user by ID_
 
-## @route POST
-Function: `CreateUser`
+### Parameters
+
+- **id** (path, int) - The ID of the user
+
+### Responses
+
+- **200**: object - OK
+- **404**: object - User not found
 
