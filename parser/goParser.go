@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -55,7 +54,6 @@ func ParseGoFile(filename string) ([]APIMetadata, error) {
 
 			for _, comment := range fn.Doc.List {
 				commentText := strings.TrimSpace(comment.Text)
-				//fmt.Println(commentText)
 				if strings.HasPrefix(commentText, "// @route") {
 					parseRoute(commentText, &api)
 				}
@@ -98,7 +96,6 @@ func parseSummary(comment string, api *APIMetadata) {
 func parseParam(comment string, api *APIMetadata) {
 	paramRegex := regexp.MustCompile(`@param (\w+) (path|query) (\w+) (true|false) "(.*)"`)
 	matches := paramRegex.FindStringSubmatch(comment)
-	//fmt.Println(matches)
 	if len(matches) == 6 {
 		param := APIParam{
 			Name:        matches[1],
@@ -113,10 +110,8 @@ func parseParam(comment string, api *APIMetadata) {
 
 // parseResponse parses the @response tag for API responses.
 func parseResponse(comment string, api *APIMetadata) {
-	fmt.Println(comment)
 	responseRegex := regexp.MustCompile(`@response (\d{3}) \{(\w+)\} (\w+) "(.*)"`)
 	matches := responseRegex.FindStringSubmatch(comment)
-	fmt.Println(matches)
 	if len(matches) == 5 {
 		response := APIResponse{
 			Status:      strToInt(matches[1]),
