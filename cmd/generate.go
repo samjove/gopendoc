@@ -61,11 +61,11 @@ func walkDirectory(rootDir string) error {
 				}
 			}
 			
-			outputFile := filepath.Join(outputDir, strings.TrimSuffix(info.Name(), ".go")+".md")
+			outputFile := filepath.Join(outputDir, strings.TrimSuffix(info.Name(), ".go")+".html")
 
-			// Generate Markdown documentation.
+			// Generate HTML documentation.
 			if len(apis) != 0 {
-				err = docgen.GenerateMarkdown(apis, outputFile)
+				err = docgen.GenerateHTML(apis, outputFile)
 				if err != nil {
 					fmt.Printf("Error generating documentation for file %s: %v\n", path, err)
 					return err
