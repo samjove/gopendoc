@@ -19,15 +19,48 @@ func GenerateMarkdown(apis []parser.APIMetadata, outputFile string) error {
 	if err != nil {
 		return err
 	}
+
 	for _, api := range apis {
 		_, err := file.WriteString(fmt.Sprintf("## %s %s\n", api.Method, api.Path))
 		if err != nil {
 			return err
 		}
-		_, err = file.WriteString(fmt.Sprintf("Function: `%s`\n\n", api.Func))
-		if err != nil {
-			return err
+
+		if api.Summary != "" {
+			_, err = file.WriteString(fmt.Sprintf("_%s_\n\n", api.Summary))
+			if err != nil {
+				return err
+			}
+		}
+
+		if len(api.Params) > 0 {
+			_, err = file.WriteString("### Parameters\n\n")
+			if err != nil {
+				return err
+			}
+			for _, param := range api.Params {
+				_, err = file.WriteString(fmt.Sprintf("- **%s** (%s, %s) - %s\n", param.Name, param.In, param.Type, param.Description))
+				if err != nil {
+					return err
+				}
+			}
+			_, err = file.WriteString("\n")
+		}
+
+		if len(api.Responses) > 0 {
+			_, err = file.WriteString("### Responses\n\n")
+			if err != nil {
+				return err
+			}
+			for _, resp := range api.Responses {
+				_, err = file.WriteString(fmt.Sprintf("- **%d**: %s - %s\n", resp.Status, resp.Type, resp.Description))
+				if err != nil {
+					return err
+				}
+			}
+			_, err = file.WriteString("\n")
 		}
 	}
+
 	return nil
 }
