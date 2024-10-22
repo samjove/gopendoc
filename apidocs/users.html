@@ -1,30 +1,36 @@
-<p>&lt;!DOCTYPE html&gt;<html><head><meta charset="UTF-8"><title>API Documentation</title><style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>API Documentation</title><style>
 		body { font-family: Arial, sans-serif; margin: 20px; }
 		h1, h2, h3 { color: #333; }
 		input#searchBar { padding: 10px; width: 100%; margin-bottom: 20px; }
+		#api-list h2 { margin-top: 20px; }
 		#searchResults p { margin: 5px 0; }
 	</style></head><body><h1>API Documentation</h1>
 <input type="text" id="searchBar" placeholder="Search API...">
-<div id="searchResults"></div></p>
+<div id="searchResults"></div>
 
-<p><script src="https://cdn.jsdelivr.net/npm/fuse.js@6.5.3"></script>
+<div id="api-list">
+<div class="api-item" data-method="GET" data-path="/users/{id}" data-summary="Get a user by ID">
+			<h2 id="-users-{id}">GET /users/{id}</h2><p><i>Get a user by ID</i></p><h3>Parameters</h3><ul><li><b>id</b> (path, int) - The ID of the user</li></ul><h3>Responses</h3><ul><li><b>200</b>: object - OK</li><li><b>404</b>: object - User not found</li></ul></div><div class="api-item" data-method="POST" data-path="/users" data-summary="Post a new user">
+			<h2 id="-users">POST /users</h2><p><i>Post a new user</i></p><h3>Responses</h3><ul><li><b>201</b>: object - User successfully created</li><li><b>403</b>: object - Bad Request</li></ul></div></div>
 <script>
-const searchBar = document.getElementById(&lsquo;searchBar&rsquo;);
-const resultsContainer = document.getElementById(&lsquo;searchResults&rsquo;);
-const apis = [
-{ &ldquo;method&rdquo;: &ldquo;@route&rdquo;, &ldquo;path&rdquo;: &ldquo;GET&rdquo;, &ldquo;anchor&rdquo;: &ldquo;GET&rdquo; },{ &ldquo;method&rdquo;: &ldquo;@route&rdquo;, &ldquo;path&rdquo;: &ldquo;POST&rdquo;, &ldquo;anchor&rdquo;: &ldquo;POST&rdquo; },
-];</p>
+	const searchBar = document.getElementById('searchBar');
+	const apiItems = document.querySelectorAll('.api-item');
+	console.log(apiItems)
 
-<p>searchBar.addEventListener(&lsquo;input&rsquo;, function() {
-	const query = searchBar.value.toLowerCase();
-	const results = apis.filter(api =&gt;
-		api.path.toLowerCase().includes(query) ||
-		api.method.toLowerCase().includes(query)
-	);
-	resultsContainer.innerHTML = &ldquo;;
-	results.forEach(result =&gt; {
-		resultsContainer.innerHTML += &lsquo;<p><a href="#' + result.anchor + '">&rsquo; + result.method + &lsquo; &rsquo; + result.path + &lsquo;</a></p>&rsquo;;
+	searchBar.addEventListener('input', function() {
+		const query = searchBar.value.toLowerCase();
+
+		apiItems.forEach(item => {
+			const method = item.getAttribute('data-method').toLowerCase();
+			const path = item.getAttribute('data-path').toLowerCase();
+			const summary = item.getAttribute('data-summary').toLowerCase();
+
+			if (method.includes(query) || path.includes(query) || summary.includes(query)) {
+				item.style.display = '';  // Show matching items
+			} else {
+				item.style.display = 'none';  // Hide non-matching items
+			}
+		});
 	});
-});
 </script>
-<h2>Table of Contents</h2><ul><li><a href="#GET">@route GET</a></li><li><a href="#POST">@route POST</a></li></ul><h2 id="GET">@route GET</h2><p><i>Get a user by ID</i></p><h3>Parameters</h3><ul><li><b>id</b> (path, int) - The ID of the user</li></ul><h3>Responses</h3><ul><li><b>200</b>: object - OK</li><li><b>404</b>: object - User not found</li></ul><h2 id="POST">@route POST</h2><p><i>Post a new user</i></p><h3>Responses</h3><ul><li><b>201</b>: object - User successfully created</li><li><b>403</b>: object - Bad Request</li></ul></body></html></p>
+</body></html>

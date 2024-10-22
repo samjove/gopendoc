@@ -5,11 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/russross/blackfriday/v2"
 	"github.com/samjove/gopendoc/parser"
 )
 
-// GenerateHTML generates the API documentation as HTML with embedded search.
+// GenerateHTML generates the API documentation as HTML with embedded JavaScript and search functionality.
 func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 	file, err := os.Create(outputFile)
 	if err != nil {
@@ -17,69 +16,40 @@ func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 	}
 	defer file.Close()
 
-	// Start writing HTML content.
+	// Start writing HTML content
 	htmlContent := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>API Documentation</title>"
 
-	// Add any CSS for styling.
+	// Add CSS for styling
 	htmlContent += `<style>
 		body { font-family: Arial, sans-serif; margin: 20px; }
 		h1, h2, h3 { color: #333; }
 		input#searchBar { padding: 10px; width: 100%; margin-bottom: 20px; }
+		#api-list h2 { margin-top: 20px; }
 		#searchResults p { margin: 5px 0; }
 	</style>`
 
-	// Close the head and start the body.
+	// Close the head and start the body
 	htmlContent += "</head><body><h1>API Documentation</h1>"
 
-	// Add search bar and search script using Fuse.js.
+	// Add search bar and search script
 	htmlContent += `
 <input type="text" id="searchBar" placeholder="Search API...">
 <div id="searchResults"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.5.3"></script>
-<script>
-const searchBar = document.getElementById('searchBar');
-const resultsContainer = document.getElementById('searchResults');
-const apis = [
+<div id="api-list">
 `
 
-	// Prepare the API data for the search script.
+	// Generate HTML for the API list
 	for _, api := range apis {
+		fmt.Printf("api.Path before replace: %s\n", api.Path)
 		anchor := strings.ReplaceAll(api.Path, "/", "-")
-		htmlContent += fmt.Sprintf(`{ "method": "%s", "path": "%s", "anchor": "%s" },`, api.Method, api.Path, anchor)
-	}
+		fmt.Printf("api.Path: %s\n", api.Path)
+		fmt.Printf("api Summary: %s\n", api.Summary)
+		htmlContent += fmt.Sprintf(`<div class="api-item" data-method="%s" data-path="%s" data-summary="%s">
+			<h2 id="%s">%s %s</h2>`, api.Method, api.Path, api.Summary, anchor, api.Method, api.Path)
 
-	// Finish the search script.
-	htmlContent += `
-];
-
-searchBar.addEventListener('input', function() {
-	const query = searchBar.value.toLowerCase();
-	const results = apis.filter(api => 
-		api.path.toLowerCase().includes(query) || 
-		api.method.toLowerCase().includes(query)
-	);
-	resultsContainer.innerHTML = '';
-	results.forEach(result => {
-		resultsContainer.innerHTML += '<p><a href="#' + result.anchor + '">' + result.method + ' ' + result.path + '</a></p>';
-	});
-});
-</script>
-`
-
-	// Add API documentation content.
-	htmlContent += "<h2>Table of Contents</h2><ul>"
-	for _, api := range apis {
-		anchor := strings.ReplaceAll(api.Path, "/", "-")
-		htmlContent += fmt.Sprintf(`<li><a href="#%s">%s %s</a></li>`, anchor, api.Method, api.Path)
-	}
-	htmlContent += "</ul>"
-
-	for _, api := range apis {
-		anchor := strings.ReplaceAll(api.Path, "/", "-")
-		htmlContent += fmt.Sprintf(`<h2 id="%s">%s %s</h2>`, anchor, api.Method, api.Path)
 		if api.Summary != "" {
-			htmlContent += fmt.Sprintf("<p><i>%s</i></p>", api.Summary)
+			htmlContent += fmt.Sprintf(`<p><i>%s</i></p>`, api.Summary)
 		}
 
 		if len(api.Params) > 0 {
@@ -97,15 +67,42 @@ searchBar.addEventListener('input', function() {
 			}
 			htmlContent += "</ul>"
 		}
+
+		htmlContent += "</div>" // Close .api-item
 	}
 
+	htmlContent += `</div>` // Close #api-list
+
+	// Add the search filtering JavaScript
+	htmlContent += `
+<script>
+	const searchBar = document.getElementById('searchBar');
+	const apiItems = document.querySelectorAll('.api-item');
+	console.log(apiItems)
+
+	searchBar.addEventListener('input', function() {
+		const query = searchBar.value.toLowerCase();
+
+		apiItems.forEach(item => {
+			const method = item.getAttribute('data-method').toLowerCase();
+			const path = item.getAttribute('data-path').toLowerCase();
+			const summary = item.getAttribute('data-summary').toLowerCase();
+
+			if (method.includes(query) || path.includes(query) || summary.includes(query)) {
+				item.style.display = '';  // Show matching items
+			} else {
+				item.style.display = 'none';  // Hide non-matching items
+			}
+		});
+	});
+</script>
+`
+
+	// Close HTML
 	htmlContent += "</body></html>"
 
-	// Convert markdown to HTML using blackfriday (in case there are any markdown elements).
-	htmlOutput := blackfriday.Run([]byte(htmlContent))
-
-	// Write the final HTML content to the output file.
-	_, err = file.Write(htmlOutput)
+	// Write the final HTML content to the output file
+	_, err = file.WriteString(htmlContent)
 	if err != nil {
 		return err
 	}

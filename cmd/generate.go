@@ -65,6 +65,7 @@ func walkDirectory(rootDir string) error {
 
 			// Generate HTML documentation.
 			if len(apis) != 0 {
+				fmt.Printf("apis before GenerateHTML: %v\n", apis)
 				err = docgen.GenerateHTML(apis, outputFile)
 				if err != nil {
 					fmt.Printf("Error generating documentation for file %s: %v\n", path, err)
