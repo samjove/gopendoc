@@ -1,36 +1,123 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>API Documentation</title><style>
-		body { font-family: Arial, sans-serif; margin: 20px; }
-		h1, h2, h3 { color: #333; }
-		input#searchBar { padding: 10px; width: 100%; margin-bottom: 20px; }
-		#api-list h2 { margin-top: 20px; }
-		#searchResults p { margin: 5px 0; }
-	</style></head><body><h1>API Documentation</h1>
-<input type="text" id="searchBar" placeholder="Search API...">
-<div id="searchResults"></div>
 
-<div id="api-list">
-<div class="api-item" data-method="GET" data-path="/products/{id}" data-summary="Get a Product by ID">
-			<h2 id="-products-{id}">GET /products/{id}</h2><p><i>Get a Product by ID</i></p><h3>Parameters</h3><ul><li><b>id</b> (path, int) - The ID of the Product</li></ul><h3>Responses</h3><ul><li><b>200</b>: object - OK</li><li><b>404</b>: object - Product not found</li></ul></div><div class="api-item" data-method="POST" data-path="/products" data-summary="Post a new Product">
-			<h2 id="-products">POST /products</h2><p><i>Post a new Product</i></p><h3>Responses</h3><ul><li><b>201</b>: object - Product successfully created</li><li><b>403</b>: object - Bad Request</li></ul></div></div>
-<script>
-	const searchBar = document.getElementById('searchBar');
-	const apiItems = document.querySelectorAll('.api-item');
-	console.log(apiItems)
-
-	searchBar.addEventListener('input', function() {
-		const query = searchBar.value.toLowerCase();
-
-		apiItems.forEach(item => {
-			const method = item.getAttribute('data-method').toLowerCase();
-			const path = item.getAttribute('data-path').toLowerCase();
-			const summary = item.getAttribute('data-summary').toLowerCase();
-
-			if (method.includes(query) || path.includes(query) || summary.includes(query)) {
-				item.style.display = '';  // Show matching items
-			} else {
-				item.style.display = 'none';  // Hide non-matching items
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>API Documentation</title>
+		<style>
+            .api-item {
+				margin-bottom: 15px;
+				padding: 10px;
+				border: 1px solid #686868;
+				border-radius: 5px;
+				background-color: #fefbea;
+				font-family: sans-serif;
 			}
-		});
-	});
-</script>
-</body></html>
+			.api-header {
+				cursor: pointer;
+				background-color: #f2ecd5;
+				padding: 10px;
+				font-weight: bold;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				border-bottom: 1px solid #dcdcdc;
+			}
+
+			.api-details {
+				display: none;
+				padding: 10px;
+				background-color: #e8e2cc;
+				border-top: 1px solid #ccc;
+			}
+            .method-tag {
+                font-size: 14px;
+                padding: 4px 8px;
+                border-radius: 3px;
+                color: black;
+            }
+            .method-get { background-color: #28a745; }
+            .method-post { background-color: #007bff; }
+            .method-put { background-color: #ffc107; }
+            .method-delete { background-color: #dc3545; }
+            .collapsible {
+                display: none;
+            }
+        </style>
+</head>
+<body>
+<a href="/">Home</a>
+<h1>API Documentation</h1>
+<input type="text" id="search-bar" placeholder="Search endpoints..." />
+
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('GET-/products/{id}')">
+				<span class="method-tag method-GET">GET</span> /products/{id}
+				<span>Get a product by ID</span>
+			</div>
+			<div class="api-details" id="GET-/products/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the product</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - object: OK</li>
+				<li><b>404</b> - object: Product not found</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('POST-/products')">
+				<span class="method-tag method-POST">POST</span> /products
+				<span>Create a new product</span>
+			</div>
+			<div class="api-details" id="POST-/products">
+		<h4>Responses:</h4><ul>
+				<li><b>201</b> - object: Product successfully created</li>
+				<li><b>400</b> - object: Invalid request</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('PUT-/products/{id}')">
+				<span class="method-tag method-PUT">PUT</span> /products/{id}
+				<span>Update a product by ID</span>
+			</div>
+			<div class="api-details" id="PUT-/products/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the product</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - object: Product successfully updated</li>
+				<li><b>404</b> - object: Product not found</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('DELETE-/products/{id}')">
+				<span class="method-tag method-DELETE">DELETE</span> /products/{id}
+				<span>Delete a product by ID</span>
+			</div>
+			<div class="api-details" id="DELETE-/products/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the product</li></ul><h4>Responses:</h4><ul>
+				<li><b>204</b> - string: Product successfully deleted</li>
+				<li><b>404</b> - object: Product not found</li></ul></div></div>
+<script>
+		function toggleDetails(id) {
+			var details = document.getElementById(id);
+			if (details.style.display === 'block') {
+				details.style.display = 'none';
+			} else {
+				details.style.display = 'block';
+			}
+		}
+		</script>
+		<script>
+		function filterAPIs() {
+        let input = document.getElementById('search-bar');
+        let filter = input.value.toLowerCase();
+        let items = document.getElementsByClassName('api-item');
+
+        for (let i = 0; i < items.length; i++) {
+            let header = items[i].getElementsByClassName('api-header')[0];
+            let textValue = header.textContent || header.innerText;
+            
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+
+    // Attach the filter function to the search bar
+    document.getElementById('search-bar').addEventListener('input', filterAPIs);
+	</script>
+</body>
+</html>

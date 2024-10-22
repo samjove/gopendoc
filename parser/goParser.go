@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -81,7 +80,6 @@ func ParseGoFile(filename string) ([]APIMetadata, error) {
 
 // parseRoute parses the @route tag for method and path.
 func parseRoute(comment string, api *APIMetadata) {
-	fmt.Printf("comment before route parse: %s\n", comment)
 	parts := strings.Split(comment, " ")
 	if len(parts) >= 3 {
 		api.Method = parts[2]

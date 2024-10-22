@@ -50,34 +50,55 @@
 <input type="text" id="search-bar" placeholder="Search endpoints..." />
 
 		<div class="api-item">
-			<div class="api-header" onclick="toggleDetails('GET-/users/{id}')">
-				<span class="method-tag method-GET">GET</span> /users/{id}
-				<span>Get a user by ID</span>
+			<div class="api-header" onclick="toggleDetails('GET-/orders')">
+				<span class="method-tag method-GET">GET</span> /orders
+				<span>List all orders</span>
 			</div>
-			<div class="api-details" id="GET-/users/{id}">
+			<div class="api-details" id="GET-/orders">
 		<h4>Parameters:</h4><ul>
-				<li><b>id</b> (path, int) - The ID of the user</li></ul><h4>Responses:</h4><ul>
-				<li><b>200</b> - object: OK</li>
-				<li><b>404</b> - object: User not found</li></ul></div></div>
+				<li><b>limit</b> (query, int) - Limit the number of results</li>
+				<li><b>offset</b> (query, int) - Offset the results</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - array: OK</li>
+				<li><b>400</b> - object: Invalid request</li></ul></div></div>
 		<div class="api-item">
-			<div class="api-header" onclick="toggleDetails('POST-/users')">
-				<span class="method-tag method-POST">POST</span> /users
-				<span>Post a new user</span>
+			<div class="api-header" onclick="toggleDetails('POST-/orders')">
+				<span class="method-tag method-POST">POST</span> /orders
+				<span>Create a new order</span>
 			</div>
-			<div class="api-details" id="POST-/users">
+			<div class="api-details" id="POST-/orders">
 		<h4>Responses:</h4><ul>
-				<li><b>201</b> - object: User successfully created</li>
-				<li><b>403</b> - object: Bad Request</li></ul></div></div>
+				<li><b>201</b> - object: Order successfully created</li>
+				<li><b>403</b> - object: Unauthorized</li></ul></div></div>
 		<div class="api-item">
-			<div class="api-header" onclick="toggleDetails('DELETE-/users/{id}')">
-				<span class="method-tag method-DELETE">DELETE</span> /users/{id}
-				<span>Delete a user by ID</span>
+			<div class="api-header" onclick="toggleDetails('GET-/orders/{id}')">
+				<span class="method-tag method-GET">GET</span> /orders/{id}
+				<span>Get an order by ID</span>
 			</div>
-			<div class="api-details" id="DELETE-/users/{id}">
+			<div class="api-details" id="GET-/orders/{id}">
 		<h4>Parameters:</h4><ul>
-				<li><b>id</b> (path, int) - The ID of the user</li></ul><h4>Responses:</h4><ul>
-				<li><b>204</b> - string: User successfully deleted</li>
-				<li><b>404</b> - object: User not found</li></ul></div></div>
+				<li><b>id</b> (path, int) - The ID of the order</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - object: OK</li>
+				<li><b>404</b> - object: Order not found</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('PUT-/orders/{id}')">
+				<span class="method-tag method-PUT">PUT</span> /orders/{id}
+				<span>Update an order by ID</span>
+			</div>
+			<div class="api-details" id="PUT-/orders/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the order</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - object: Order successfully updated</li>
+				<li><b>404</b> - object: Order not found</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('DELETE-/orders/{id}')">
+				<span class="method-tag method-DELETE">DELETE</span> /orders/{id}
+				<span>Delete an order by ID</span>
+			</div>
+			<div class="api-details" id="DELETE-/orders/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the order</li></ul><h4>Responses:</h4><ul>
+				<li><b>204</b> - string: Order successfully deleted</li>
+				<li><b>404</b> - object: Order not found</li></ul></div></div>
 <script>
 		function toggleDetails(id) {
 			var details = document.getElementById(id);

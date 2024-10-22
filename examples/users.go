@@ -17,3 +17,12 @@ func GetUser() {
 func PostUser() {
 	// Logic to post a user
 }
+
+// @route DELETE /users/{id}
+// @summary Delete a user by ID
+// @param id path int true "The ID of the user"
+// @response 204 {string} string "User successfully deleted"
+// @response 404 {object} ErrorResponse "User not found"
+func DeleteUser() {
+	// Logic to delete a user
+}

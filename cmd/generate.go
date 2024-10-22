@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	rootDir  string
+	rootDir   string
 	outputDir string
 )
 
 var generateCmd = &cobra.Command{
-	Use: "gen",
+	Use:   "gen",
 	Short: "Generate API documentation for all Go files in the directory",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Generating API documentation...")
@@ -39,15 +39,15 @@ func init() {
 
 // Function to walk through all files in the directory and subdirectories
 func walkDirectory(rootDir string) error {
-   return filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
-        if err != nil {
-            return err
-        }
+	return filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 
-        // Only process .go files
-        if !info.IsDir() && strings.HasSuffix(info.Name(), ".go") {
-            fmt.Println("Parsing file:", path)
-            apis, err := parser.ParseGoFile(path)
+		// Only process .go files
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".go") {
+			fmt.Println("Parsing file:", path)
+			apis, err := parser.ParseGoFile(path)
 			if err != nil {
 				fmt.Printf("Error parsing file %s: %v\n", path, err)
 				return err
@@ -60,12 +60,11 @@ func walkDirectory(rootDir string) error {
 					return err
 				}
 			}
-			
+
 			outputFile := filepath.Join(outputDir, strings.TrimSuffix(info.Name(), ".go")+".html")
 
 			// Generate HTML documentation.
 			if len(apis) != 0 {
-				fmt.Printf("apis before GenerateHTML: %v\n", apis)
 				err = docgen.GenerateHTML(apis, outputFile)
 				if err != nil {
 					fmt.Printf("Error generating documentation for file %s: %v\n", path, err)
@@ -73,7 +72,7 @@ func walkDirectory(rootDir string) error {
 				}
 				fmt.Printf("Documentation generated for %s -> %s\n", path, outputFile)
 			}
-        }
-        return nil
-    })
+		}
+		return nil
+	})
 }

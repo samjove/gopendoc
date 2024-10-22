@@ -1,21 +1,4 @@
-package docgen
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/samjove/gopendoc/parser"
-)
-
-// GenerateHTML generates the API documentation as HTML with embedded JavaScript and search functionality.
-func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
-	file, err := os.Create(outputFile)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = file.WriteString(`
     <!DOCTYPE html>
     <html>
     <head>
@@ -65,70 +48,37 @@ func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 <a href="/">Home</a>
 <h1>API Documentation</h1>
 <input type="text" id="search-bar" placeholder="Search endpoints..." />
-`)
 
-	if err != nil {
-		return err
-	}
-
-	for _, api := range apis {
-		id := fmt.Sprintf("%s-%s", api.Method, api.Path) // create unique id for each section
-
-		// Write the compact header (method, path, summary)
-		_, err = file.WriteString(fmt.Sprintf(`
 		<div class="api-item">
-			<div class="api-header" onclick="toggleDetails('%s')">
-				<span class="method-tag method-%s">%s</span> %s
-				<span>%s</span>
+			<div class="api-header" onclick="toggleDetails('GET-/customers')">
+				<span class="method-tag method-GET">GET</span> /customers
+				<span>Get a list of customers</span>
 			</div>
-			<div class="api-details" id="%s">
-		`, id, api.Method, api.Method, api.Path, api.Summary, id))
-
-		if err != nil {
-			return err
-		}
-
-		// Write parameters section
-		if len(api.Params) > 0 {
-			_, err = file.WriteString("<h4>Parameters:</h4><ul>")
-			if err != nil {
-				return err
-			}
-			for _, param := range api.Params {
-				_, err = file.WriteString(fmt.Sprintf(`
-				<li><b>%s</b> (%s, %s) - %s</li>`, param.Name, param.In, param.Type, param.Description))
-				if err != nil {
-					return err
-				}
-			}
-			_, err = file.WriteString("</ul>")
-		}
-
-		// Write responses section
-		if len(api.Responses) > 0 {
-			_, err = file.WriteString("<h4>Responses:</h4><ul>")
-			if err != nil {
-				return err
-			}
-			for _, resp := range api.Responses {
-				_, err = file.WriteString(fmt.Sprintf(`
-				<li><b>%d</b> - %s: %s</li>`, resp.Status, resp.Type, resp.Description))
-				if err != nil {
-					return err
-				}
-			}
-			_, err = file.WriteString("</ul>")
-		}
-
-		// Close API details
-		_, err = file.WriteString("</div></div>")
-		if err != nil {
-			return err
-		}
-	}
-
-	// Close HTML tags
-	_, err = file.WriteString(`
+			<div class="api-details" id="GET-/customers">
+		<h4>Parameters:</h4><ul>
+				<li><b>limit</b> (query, int) - Limit the number of results</li>
+				<li><b>offset</b> (query, int) - Offset the results</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - array: OK</li>
+				<li><b>403</b> - object: Unauthorized</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('GET-/customers/{id}')">
+				<span class="method-tag method-GET">GET</span> /customers/{id}
+				<span>Get a customer by ID</span>
+			</div>
+			<div class="api-details" id="GET-/customers/{id}">
+		<h4>Parameters:</h4><ul>
+				<li><b>id</b> (path, int) - The ID of the customer</li></ul><h4>Responses:</h4><ul>
+				<li><b>200</b> - object: OK</li>
+				<li><b>404</b> - object: Customer not found</li></ul></div></div>
+		<div class="api-item">
+			<div class="api-header" onclick="toggleDetails('POST-/customers')">
+				<span class="method-tag method-POST">POST</span> /customers
+				<span>Create a new customer</span>
+			</div>
+			<div class="api-details" id="POST-/customers">
+		<h4>Responses:</h4><ul>
+				<li><b>201</b> - object: Customer successfully created</li>
+				<li><b>400</b> - object: Invalid request</li></ul></div></div>
 <script>
 		function toggleDetails(id) {
 			var details = document.getElementById(id);
@@ -162,10 +112,3 @@ func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 	</script>
 </body>
 </html>
-`)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
