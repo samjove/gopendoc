@@ -1,6 +1,6 @@
 # Gopendoc
 
-### API Documentation Generator
+### Searchable API Documentation Generator
 Gopendoc is a lightweight tool that generates HTML API documentation for Go projects based on code annotations. It scans your Go files for specific comments (e.g., // @route, // @summary, // @param, // @response), generates user-friendly HTML pages with search functionality, and serves them in your local environment.
 
 #### Features
