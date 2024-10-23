@@ -56,8 +56,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 ```
 This will generate an HTML section for the GET /users endpoint, listing its parameters and responses.
 
-The "examples" directory contains additional examples and the "apidocs" directory holds the generated HTML.
-
 #### Output
 Gopendoc generates an HTML file in the specified output directory. The generated HTML includes:
 
