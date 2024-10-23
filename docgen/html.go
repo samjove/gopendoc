@@ -102,6 +102,9 @@ func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 				}
 			}
 			_, err = file.WriteString("</ul>")
+			if err != nil {
+				return err
+			}
 		}
 
 		// Write responses section
@@ -118,6 +121,9 @@ func GenerateHTML(apis []parser.APIMetadata, outputFile string) error {
 				}
 			}
 			_, err = file.WriteString("</ul>")
+			if err != nil {
+				return err
+			}
 		}
 
 		// Close API details

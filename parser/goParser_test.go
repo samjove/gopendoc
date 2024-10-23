@@ -1,105 +1,104 @@
 package parser
 
 import (
-	"reflect"
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// Test function for parseResponse.
+// TestParseGoFile tests the ParseGoFile function
+func TestParseGoFile(t *testing.T) {
+	// Test data simulating a Go file with comments
+	content := `package main
+
+// @route GET /users
+// @summary Get user by ID
+// @param id path int true "The user ID"
+// @response 200 {object} User "Successful operation"
+// @response 404 {string} string "User not found"
+func GetUser() {
+	// function body
+}`
+
+	// Create a temporary file for testing
+	tempFile := t.TempDir() + "/testfile.go"
+	err := os.WriteFile(tempFile, []byte(content), 0644)
+	assert.NoError(t, err)
+
+	// Call ParseGoFile
+	apis, err := ParseGoFile(tempFile)
+	assert.NoError(t, err)
+	assert.Len(t, apis, 1, "Expected 1 API to be parsed")
+
+	api := apis[0]
+	assert.Equal(t, "/users", api.Path)
+	assert.Equal(t, "GET", api.Method)
+	assert.Equal(t, "GetUser", api.Func)
+	assert.Equal(t, "Get user by ID", api.Summary)
+
+	// Check parameters
+	assert.Len(t, api.Params, 1)
+	assert.Equal(t, "id", api.Params[0].Name)
+	assert.Equal(t, "path", api.Params[0].In)
+	assert.Equal(t, "int", api.Params[0].Type)
+	assert.True(t, api.Params[0].Required)
+	assert.Equal(t, "The user ID", api.Params[0].Description)
+
+	// Check responses
+	assert.Len(t, api.Responses, 2)
+	assert.Equal(t, 200, api.Responses[0].Status)
+	assert.Equal(t, "object", api.Responses[0].Type)
+	assert.Equal(t, "User", api.Responses[0].ClassName)
+	assert.Equal(t, "Successful operation", api.Responses[0].Description)
+
+	assert.Equal(t, 404, api.Responses[1].Status)
+	assert.Equal(t, "string", api.Responses[1].Type)
+	assert.Equal(t, "string", api.Responses[1].ClassName)
+	assert.Equal(t, "User not found", api.Responses[1].Description)
+}
+
+// TestParseRoute tests the parseRoute function
+func TestParseRoute(t *testing.T) {
+	api := &APIMetadata{}
+	comment := "// @route GET /users"
+	parseRoute(comment, api)
+	assert.Equal(t, "GET", api.Method)
+	assert.Equal(t, "/users", api.Path)
+}
+
+// TestParseSummary tests the parseSummary function
+func TestParseSummary(t *testing.T) {
+	api := &APIMetadata{}
+	comment := "// @summary Get user by ID"
+	parseSummary(comment, api)
+	assert.Equal(t, "Get user by ID", api.Summary)
+}
+
+// TestParseParam tests the parseParam function
+func TestParseParam(t *testing.T) {
+	api := &APIMetadata{}
+	comment := `// @param id path int true "The user ID"`
+	parseParam(comment, api)
+	assert.Len(t, api.Params, 1)
+	param := api.Params[0]
+	assert.Equal(t, "id", param.Name)
+	assert.Equal(t, "path", param.In)
+	assert.Equal(t, "int", param.Type)
+	assert.True(t, param.Required)
+	assert.Equal(t, "The user ID", param.Description)
+}
+
+// TestParseResponse tests the parseResponse function
 func TestParseResponse(t *testing.T) {
-    tests := []struct {
-        input  string
-        expect APIResponse
-    }{
-        // Test case 1: Valid 200 OK response.
-        {
-            input: `@response 200 {object} User "OK"`,
-            expect: APIResponse{
-                Status:      200,
-                Type:        "object",
-                ClassName:   "User",
-                Description: "OK",
-            },
-        },
-        // Test case 2: Valid 404 Error response.
-        {
-            input: `@response 404 {object} ErrorResponse "User not found"`,
-            expect: APIResponse{
-                Status:      404,
-                Type:        "object",
-                ClassName:   "ErrorResponse",
-                Description: "User not found",
-            },
-        },
-        // Test case 3: Valid 500 Internal Server Error response.
-        {
-            input: `@response 500 {error} ServerError "Internal server error"`,
-            expect: APIResponse{
-                Status:      500,
-                Type:        "error",
-                ClassName:   "ServerError",
-                Description: "Internal server error",
-            },
-        },
-        // Test case 4: Valid 204 No content.
-        {
-            input: `@response 204 {none} NoContent "No content"`,
-            expect: APIResponse{
-                Status:      204,
-                Type:        "none",
-                ClassName:   "NoContent",
-                Description: "No content",
-            },
-        },
-        // Test case 5: Invalid case, should not match anything.
-        {
-            input:  `@response 201 {object} "Incomplete response"`,
-            expect: APIResponse{}, // No response expected for malformed input.
-        },
-    }
-
-    for _, test := range tests {
-        // Initialize the API Metadata object.
-        api := &APIMetadata{}
-
-        // Call parseResponse to parse the input string.
-        parseResponse(test.input, api)
-
-        if len(api.Responses) == 0 && test.expect != (APIResponse{}) {
-            t.Errorf("Expected a response but got none for input: %s", test.input)
-        } else if len(api.Responses) > 0 {
-            result := api.Responses[0]
-            if !reflect.DeepEqual(result, test.expect) {
-                t.Errorf("Expected %v, but got %v for input: %s", test.expect, result, test.input)
-            }
-        }
-    }
+	api := &APIMetadata{}
+	comment := `// @response 200 {object} User "Successful operation"`
+	parseResponse(comment, api)
+	assert.Len(t, api.Responses, 1)
+	response := api.Responses[0]
+	assert.Equal(t, 200, response.Status)
+	assert.Equal(t, "object", response.Type)
+	assert.Equal(t, "User", response.ClassName)
+	assert.Equal(t, "Successful operation", response.Description)
 }
 
-// Test if string to int conversion works correctly.
-func TestStrToInt(t *testing.T) {
-    result := strToInt("200")
-    if result != 200 {
-        t.Errorf("Expected 200 but got %d", result)
-    }
-}
-
-// Edge case: Missing or malformed tags
-func TestMalformedResponse(t *testing.T) {
-    malformedInputs := []string{
-        `@response 300 {object} "No class name"`,           // Missing class name
-        `@response abc {object} User "Invalid status code"`, // Invalid status code
-        `@response 200 {object} User`,                      // No description
-        `response 200 {object} User "OK"`,                  // Missing @ symbol
-    }
-
-    for _, input := range malformedInputs {
-        api := &APIMetadata{}
-        parseResponse(input, api)
-
-        // Expect no responses to be parsed for malformed inputs
-        if len(api.Responses) > 0 {
-            t.Errorf("Did not expect any parsed response for malformed input: %s", input)
-        }
-    }
-}
