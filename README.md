@@ -10,6 +10,16 @@ Gopendoc is a lightweight tool that generates HTML API documentation for Go proj
 - Enables viewing with search functionality to filter API endpoints.
 - Minimal dependencies and easy integration into Go projects.
 
+##### Example of an api doc viewed in a browser
+![Example of an api doc viewed in a browser](https://github.com/user-attachments/assets/c1598942-226e-4ea2-a208-0f49e3b64d99)
+
+##### The same api with an endpoint expanded
+![The same api with an endpoint expanded](https://github.com/user-attachments/assets/0e48a8ca-32dc-4abb-8fbc-89d7b33ea4bb)
+
+##### The same api with a search filter of "ID" applied
+![The same api with a search filter of "ID" applied](https://github.com/user-attachments/assets/0346a963-e6e8-40e3-ac47-e797b6d341d8)
+
+
 #### Installation
 Ensure that Go is installed and set up in your environment.
 
@@ -72,6 +82,9 @@ Typical contribution process:
 - Commit your changes
 - Push to the branch
 - Open a pull request
+
+#### Roadmap
+Future plans include integrating the tool into a CI pipeline and supporting additional languages.
 
 #### License
 This project is licensed under the MIT License. See the LICENSE file for details.
